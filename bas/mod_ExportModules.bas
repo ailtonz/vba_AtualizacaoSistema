@@ -1,6 +1,7 @@
 Attribute VB_Name = "mod_ExportModules"
 Option Explicit
 
+'' https://social.msdn.microsoft.com/Forums/en-US/57813453-9a21-4080-9d4a-e548e715d7ca/add-visual-basic-extensibility-library-through-code?forum=isvvba
 Sub ListRefPathsGUID()
      'Macro purpose:  To determine full path and Globally Unique Identifier (GUID)
      'to each referenced library.  Select the reference in the Tools\References
@@ -22,6 +23,8 @@ Sub AddRefGuid()
         "{0002E157-0000-0000-C000-000000000046}", 2, 0
  
 End Sub
+
+'' https://www.rondebruin.nl/win/s9/win002.htm
 
 Public Sub ExportModules()
     Dim bExport As Boolean

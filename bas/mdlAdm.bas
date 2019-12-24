@@ -2,7 +2,6 @@ Attribute VB_Name = "mdlAdm"
 Option Explicit
 Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
 
-
 Sub cmdBanco_Click(control As IRibbonControl)
 Dim filename As clsPathAndFiles: Set filename = New clsPathAndFiles
 Dim sBancoCaminho As String:      sBancoCaminho = Replace(Replace(ThisWorkbook.Names("userBancoCaminho").value, "=", ""), Chr(34), "")
@@ -71,7 +70,29 @@ End Select
 End Sub
 
 Sub cmdUpdate_Click(control As IRibbonControl)
-    Principal
+Dim objBanco As Banco: Set objBanco = New Banco
+Dim ws As Worksheet: Set ws = Worksheets(GetSheetNome)
+Dim lrow As Long, x As Long
+
+ws.Visible = xlSheetVeryHidden
+ws.Visible = xlSheetVisible
+ws.Activate
+
+ws.Range("A:A").Activate
+ActiveCell.EntireColumn.Hidden = True
+ws.Range("B2").Activate
+        
+lrow = ws.Cells(Rows.count, 2).End(xlUp).Offset(1, 0).Row
+
+With objBanco
+    
+    For x = 2 To lrow - 1
+        .Exe CStr(ws.Range("A" & x).value)
+        ws.Range("B" & x).value = "OK"
+    Next
+
+End With
+
 End Sub
 
 Public Sub Principal()
@@ -118,9 +139,7 @@ For i = 1 To Worksheets.count
     
     End If
     
-    
 Next i
-
 
 End Sub
 
@@ -141,35 +160,6 @@ End With
 Set objBanco = Nothing
 
 End Sub
-
-'Callback for comboBox getText
-Sub GetOperacao(control As IRibbonControl, ByRef returnedVal)
-    returnedVal = GetOperacaoNome
-End Sub
-'Callback for comboBox onChange
-Sub SetOperacao(control As IRibbonControl, text As String)
-    SetOperacaoNome text
-End Sub
-
-Public Function SetOperacaoNome(pOperacao As String)
-    ThisWorkbook.Names("userOperacao").value = pOperacao
-    ThisWorkbook.Save
-End Function
-
-Public Function GetOperacaoNome() As String
-    GetOperacaoNome = Replace(Replace(ThisWorkbook.Names("userOperacao").value, "=", ""), Chr(34), "")
-End Function
-
-Public Function GetOperacaoID(pOperacao As String) As Integer
-    Dim dict As Dictionary
-    Set dict = New Dictionary
-    With dict
-        .add "ADM", 1:   .add "UPD", 2
-    End With
-    
-    GetOperacaoID = dict.item(pOperacao)
-End Function
-
 
 Public Function AtivarPlanilha(Bloqueio As Boolean)
 ''    ActiveWindow.DisplayWorkbookTabs = Bloqueio
@@ -195,10 +185,10 @@ Public Function AtivarPlanilha(Bloqueio As Boolean)
 End Function
 
 Sub testeWorksheets()
-    
 Dim i As Integer
-For i = 1 To Worksheets.count
-    MsgBox Worksheets(i).Name
-Next i
+
+    For i = 1 To Worksheets.count
+        MsgBox Worksheets(i).Name
+    Next i
 
 End Sub
