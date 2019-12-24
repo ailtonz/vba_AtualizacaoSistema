@@ -5,7 +5,7 @@ Public Const SenhaBanco As String = "abc"
 Public Const GuiaApoio As String = "Apoio"
 
 Sub Atualizar(ByVal Control As IRibbonControl)
-    bkp
+    
     AtualizarBanco GuiaApoio
     MsgBox "Banco atualizado!"
 End Sub
@@ -13,15 +13,29 @@ End Sub
 Sub ExecutarTarefas(ByVal Control As IRibbonControl)
 Dim ws As Worksheet
 Dim strBanco As String
+Dim strSheet As String: strSheet = ActiveSheet.Name
 
 Set ws = Worksheets(GuiaApoio)
 strBanco = ws.Range(BancoLocal).Value
 
-CadastrarIntervalosEdicoes strBanco, SenhaBanco, "CADASTRO - INTERVALOS DE EDIÇÃO"
+Select Case strSheet
 
-RelacionarEtapas strBanco, SenhaBanco, "RELACIONAR - EDIÇÃO X ETAPA"
+    Case "ADM - EDIÇÃO X ETAPA"
+        RelacionarEtapas strBanco, SenhaBanco, strSheet
 
-PermissoesUsuarios strBanco, SenhaBanco, "PERMISSÃO DE USUÁRIOS"
+    Case "ADM - PERMISSÕES DE USUÁRIOS"
+        PermissoesUsuarios strBanco, SenhaBanco, strSheet
+        
+    Case "ADM - EXCLUIR PERMISSÕES"
+        PermissoesUsuarios strBanco, SenhaBanco, strSheet
+                
+    Case "ADM - CADASTROS DE FORMULARIOS"
+        CadastrarFormulario strBanco, SenhaBanco, strSheet
+        
+    Case "ADM - INTERVALOS DE EDIÇÕES"
+        CadastrarIntervaloEdicao strBanco, SenhaBanco, strSheet
+        
+End Select
 
 MsgBox "Tarefas concluidas!"
 
@@ -39,6 +53,7 @@ Dim strBanco As String
 Dim strQry As String
 Dim strSQL As String
 Dim strDbDestino As String
+
 
 Inicio:
 
@@ -63,6 +78,9 @@ If Not getFileStatus(strBanco) Then
     
 'ATUALIZAR BANCO
 Else
+    ''
+    bkp
+    
     'CARREGAR BANCO
     Set db = DBEngine.OpenDatabase(strBanco, False, False, "MS Access;PWD=" & SenhaBanco)
         
@@ -156,7 +174,8 @@ admUsuariosPermissoes_err:
     Resume admUsuariosPermissoes_Fim
 End Function
 
-Public Function CadastrarIntervalosEdicoes(ByVal strCaminhoBanco As String, ByVal strSenhaBanco As String, ByVal strGuiaTarefa As String)
+
+Public Function CadastrarFormulario(ByVal strCaminhoBanco As String, ByVal strSenhaBanco As String, ByVal strGuiaTarefa As String)
 On Error GoTo admUsuariosPermissoes_err
 
 Dim ws As Worksheet
@@ -178,13 +197,65 @@ lRow = ws.Cells(Rows.Count, 2).End(xlUp).Offset(1, 0).Row
 
 ''PARAMETROS DA CONSULTA
 For x = 2 To lRow - 1
-    If (ws.Cells(x, 5).Value) = "" Then
+    If (ws.Cells(x, 6).Value) = "" Then
         With qdf
-            .Parameters("NM_CATEGORIA") = ws.Cells(x, 2).Value
-            .Parameters("NM_SUBCATEGORIA") = ws.Cells(x, 3).Value
-            .Parameters("NM_SELECAO") = ws.Cells(x, 4).Value
+            .Parameters("NM_FORMULARIO") = ws.Cells(x, 2).Value
+            .Parameters("NM_INICIO") = ws.Cells(x, 3).Value
+            .Parameters("NM_TERMINIO") = ws.Cells(x, 4).Value
+            .Parameters("SN_OCULTO") = ws.Cells(x, 5).Value
             .Execute
-            ws.Cells(x, 5).Value = "ok"
+            ws.Cells(x, 6).Value = "ok"
+        End With
+    End If
+Next x
+
+qdf.Close
+db.Close
+
+admUsuariosPermissoes_Fim:
+
+    Set db = Nothing
+    Set qdf = Nothing
+    Set ws = Nothing
+    
+    Exit Function
+admUsuariosPermissoes_err:
+    MsgBox Err.Description
+    Resume admUsuariosPermissoes_Fim
+End Function
+
+Public Function CadastrarIntervaloEdicao(ByVal strCaminhoBanco As String, ByVal strSenhaBanco As String, ByVal strGuiaTarefa As String)
+On Error GoTo admUsuariosPermissoes_err
+
+Dim ws As Worksheet
+Dim db As DAO.Database
+Dim qdf As DAO.QueryDef
+Dim strValor As String
+
+''BANCO DE DADOS
+Set db = DBEngine.OpenDatabase(strCaminhoBanco, False, False, "MS Access;PWD=" & strSenhaBanco)
+
+''NOME DA GUIA
+Set ws = Worksheets(strGuiaTarefa)
+
+''NOME DA CONSULTA
+Dim strNomeConsulta As String: strNomeConsulta = ws.Range("A1")
+Set qdf = db.QueryDefs(strNomeConsulta)
+
+'ENCONTRAR PRIMEIRA LINHA VAZIA NA GUIA
+lRow = ws.Cells(Rows.Count, 2).End(xlUp).Offset(1, 0).Row
+
+''PARAMETROS DA CONSULTA
+For x = 2 To lRow - 1
+    If (ws.Cells(x, 7).Value) = "" Then
+        With qdf
+            .Parameters("NM_EDICAO") = ws.Cells(x, 2).Value
+            .Parameters("NM_SELECAO") = Replace(ws.Cells(x, 3).Value, ";", ",")
+            .Parameters("VL_PADRAO") = ws.Cells(x, 4).Value
+            .Parameters("SN_EDITAR") = ws.Cells(x, 5).Value
+            .Parameters("SN_ATUALIZAR") = ws.Cells(x, 6).Value
+            .Execute
+            ws.Cells(x, 7).Value = "ok"
         End With
     End If
 Next x
@@ -261,6 +332,6 @@ Dim strControle As String: strControle = Controle
 Dim strBanco As String: strBanco = ws.Range(BancoLocal).Value
 Dim strDbDestino As String: strDbDestino = getPath(strBanco) & strControle & ".zip"
     
-Zip strBanco, strDbDestino
+Compact strBanco, strDbDestino
 
 End Sub

@@ -14,7 +14,7 @@ Public Sub ExportModules()
     Dim FolderWithVBAProjectFiles As String: FolderWithVBAProjectFiles = strPath & strPrj
     
     If Dir(strPath & strPrj, vbDirectory) = vbNullString Then
-        MkDir strPath & Left(strPrj, Len(strPrj) - 4)
+        'MkDir strPath & Left(strPrj, Len(strPrj) - 4)
         MkDir strPath & strPrj
     End If
     
