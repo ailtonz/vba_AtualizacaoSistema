@@ -29,7 +29,7 @@ Set tdfNew = dbDestino.CreateTableDef(strTabela)
 
 Dim x As Integer
     
-    For x = 0 To dbORIGEM.TableDefs(strTabela).Fields.Count - 1
+    For x = 0 To dbORIGEM.TableDefs(strTabela).Fields.count - 1
     
         With tdfNew
     
@@ -92,7 +92,7 @@ While Not rstORIGEM.EOF
 
     rstDESTINO.AddNew
 
-    For x = 0 To dbORIGEM.TableDefs(strTabela).Fields.Count - 1
+    For x = 0 To dbORIGEM.TableDefs(strTabela).Fields.count - 1
 
         With tdfNew
              rstDESTINO.Fields(dbDestino.TableDefs(strTabela).Fields(x).Properties("name")) = rstORIGEM.Fields(dbORIGEM.TableDefs(strTabela).Fields(x).Properties("name"))

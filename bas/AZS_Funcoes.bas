@@ -29,7 +29,7 @@ SelecionarBanco_err:
 End Function
 
 Public Function Controle() As String
-    Controle = Right(Year(Now()), 2) & Format(Month(Now()), "00") & Format(Day(Now()), "00") & "-" & Format(hour(Now()), "00") & Format(Minute(Now()), "00")
+    Controle = Right(Year(Now()), 2) & Format(Month(Now()), "00") & Format(Day(Now()), "00") & "_" & Format(hour(Now()), "00") & Format(Minute(Now()), "00")
 End Function
 
 Public Function DivisorDeTexto(Texto As String, divisor As String, Indice As Integer) As String
@@ -68,7 +68,17 @@ End If
 End Function
 
 
+Function gerarCopia()
+Const OverwriteExisting = True
 
+Dim ws As Worksheet: Set ws = Worksheets(GuiaApoio)
+Dim strControle As String: strControle = Controle
+Dim strBanco As String: strBanco = ws.Range(BancoLocal).Value
+Dim objFSO: Set objFSO = CreateObject("Scripting.FileSystemObject")
+
+objFSO.CopyFile strBanco, getPath(strBanco) + getFileName(strBanco) + "_" + strControle + getFileExt(strBanco), OverwriteExisting
+
+End Function
 
 
 

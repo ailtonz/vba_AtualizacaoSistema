@@ -1,6 +1,32 @@
 Attribute VB_Name = "mod_ExportModules"
 Option Explicit
 
+'' https://social.msdn.microsoft.com/Forums/en-US/57813453-9a21-4080-9d4a-e548e715d7ca/add-visual-basic-extensibility-library-through-code?forum=isvvba
+Sub ListRefPathsGUID()
+     'Macro purpose:  To determine full path and Globally Unique Identifier (GUID)
+     'to each referenced library.  Select the reference in the Tools\References
+     'window, then run this code to get the information on the reference's library
+    
+    Dim i As Long
+   
+    For i = 1 To ThisWorkbook.VBProject.References.count
+        With ThisWorkbook.VBProject.References(i)
+            Debug.Print .Name & "    " & .FullPath & "    " & .GUID
+        End With
+    Next i
+End Sub
+
+Sub AddRefGuid()
+On Error Resume Next
+    'Add VBIDE (Microsoft Visual Basic for Applications Extensibility 5.3
+   
+    ThisWorkbook.VBProject.References.AddFromGuid _
+        "{0002E157-0000-0000-C000-000000000046}", 2, 0
+ 
+End Sub
+
+'' https://www.rondebruin.nl/win/s9/win002.htm
+
 Public Sub ExportModules()
     Dim bExport As Boolean
     Dim wkbSource As Excel.Workbook
@@ -14,7 +40,7 @@ Public Sub ExportModules()
     Dim FolderWithVBAProjectFiles As String: FolderWithVBAProjectFiles = strPath & strPrj
     
     If Dir(strPath & strPrj, vbDirectory) = vbNullString Then
-        MkDir strPath & Left(strPrj, Len(strPrj) - 4)
+        'MkDir strPath & Left(strPrj, Len(strPrj) - 4)
         MkDir strPath & strPrj
     End If
     

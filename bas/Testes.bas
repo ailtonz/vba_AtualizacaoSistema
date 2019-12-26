@@ -27,7 +27,7 @@ Set ws = Worksheets(GuiaApoio)
 Dim strBanco As String: strBanco = ws.Range(BancoLocal).Value
 
 'ENCONTRAR PRIMEIRA LINHA VAZIA NA GUIA
-lRow = ws.Cells(Rows.Count, 5).End(xlUp).Offset(1, 0).Row
+lRow = ws.Cells(Rows.count, 5).End(xlUp).Offset(1, 0).Row
 
 For x = 2 To lRow - 1
     With ws
